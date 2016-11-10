@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--TODO Definir a URL-->
+    <string name="BASE_NEWS_URL">https://www.googleapis.com/books/v1/volumes?</string>
+</resources>

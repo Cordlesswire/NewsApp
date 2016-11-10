@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     >
 
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,13 +18,39 @@
         />
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem"
-        tools:text="CONTENT"
+        tools:text="TITLE"
+        android:textStyle="bold"
         />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="45dp"
+        >
+        <TextView
+            android:id="@+id/dateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceListItem"
+            tools:text="DATE"
+            />
+        <TextView
+            android:id="@+id/sectionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:textAppearance="?attr/textAppearanceListItem"
+            tools:text="SECTION"
+            />
+    </LinearLayout>
 
-</LinearLayout>
+
+</RelativeLayout>

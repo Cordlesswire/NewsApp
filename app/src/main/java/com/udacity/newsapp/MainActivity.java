@@ -1,25 +1,47 @@
 package com.udacity.newsapp;
 
+import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Intent;
+import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.udacity.newsapp.dummy.DummyContent;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.udacity.newsapp.dummy.DummyContent.ITEMS;
 
-public class MainActivity extends AppCompatActivity {
 
-    private boolean mTwoPane;
+public class MainActivity extends AppCompatActivity
+                          implements View.OnFocusChangeListener,
+                                     SearchView.OnQueryTextListener,
+                                     MenuItemCompat.OnActionExpandListener,
+                                     LoaderManager.LoaderCallbacks<List<DummyContent.DummyItem>> {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int BOOK_LOADER_ID = 1;
+    //
+    private String mQuery;
+    //
+    private NewsRecyclerAdapter mAdapter;
+    private List<DummyContent.DummyItem> mNewses;
+    private RecyclerView mRecyclerView;
 
 
     @Override
@@ -30,13 +52,29 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setupToolbar(toolbar);
 
-        View recyclerView = findViewById(R.id.item_list);
-        assert recyclerView != null;
-        setupRecyclerView((RecyclerView) recyclerView);
+        mNewses = new ArrayList<>();
+        mNewses.addAll(ITEMS);
 
-        if (findViewById(R.id.item_detail_container) != null) {
-            mTwoPane = true;
+        if (savedInstanceState != null) {
+            mQuery = savedInstanceState.getString("query");
         }
+
+        mAdapter = new NewsRecyclerAdapter(this, mNewses);
+        mRecyclerView = (RecyclerView) findViewById(R.id.item_list);
+        assert mRecyclerView != null;
+        setupRecyclerView(mRecyclerView, mAdapter);
+
+        ConnectivityManager conn = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = conn.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(BOOK_LOADER_ID, null, this);
+        } else {
+            Snackbar.make(mRecyclerView, getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+
+        getLoaderManager().restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
     }
 
 
@@ -46,89 +84,137 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DummyContent.ITEMS));
+    private void setupRecyclerView(@NonNull RecyclerView recyclerView, NewsRecyclerAdapter adapter) {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
     }
 
 
-    public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>
-    {
-        private final List<DummyContent.DummyItem> mValues;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextFocusChangeListener(this);
+        searchView.setOnQueryTextListener(this);
+        MenuItemCompat.setOnActionExpandListener(searchItem, this);
+        return true;
+    }
 
-        public SimpleItemRecyclerViewAdapter(List<DummyContent.DummyItem> items)
-        {
-            mValues = items;
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_search) {
+            return true;
         }
+        return super.onOptionsItemSelected(item);
+    }
 
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
-        {
-            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_list_content, parent, false);
-            return new ViewHolder(view);
+
+    @Override
+    public void onFocusChange(View view, boolean b) {
+        Log.i(TAG, "onFocusChange");
+    }
+
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        ConnectivityManager conn = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = conn.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            mQuery = query;
+            Log.i(TAG, "onQueryTextSubmit | mQuery: " + mQuery);
+            getLoaderManager().restartLoader(BOOK_LOADER_ID, null, this);
+        } else {
+            Snackbar.make(mRecyclerView, getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
         }
+        return false;
+    }
 
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position)
-        {
-            holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+    @Override
+    public boolean onQueryTextChange(String searchQuery) {
+        Log.i(TAG, "onQueryTextChange | searchQuery: " + searchQuery);
+        assert searchQuery != null;
+        assert mNewses != null;
+        List<DummyContent.DummyItem> results = mAdapter.filter(searchQuery.trim(), mNewses);//(ArrayList<DummyContent.DummyItem>) DummyContent.ITEMS
+        Log.v("App", searchQuery + ", " + mNewses.size() + ", " + results.size());
+        mAdapter.animateTo(results);
+//        mListView.invalidate();
+        mRecyclerView.scrollToPosition(0);
+        return true;
+    }
 
-            startupActivityOnClick(holder);
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        return true;
+    }
+
+
+    @Override
+    public Loader<List<DummyContent.DummyItem>> onCreateLoader(int id, Bundle bundle) {
+        Uri baseUri = Uri.parse(getString(R.string.BASE_NEWS_URL));
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+        if (mQuery == null) {
+            mQuery = "Udacity";
         }
+        Log.i(TAG, "onCreateLoader | mQuery: " + mQuery);
+        // TODO Rever as duas linhas a seguir:
+        uriBuilder.appendQueryParameter("q", mQuery);
+        uriBuilder.appendQueryParameter("maxResults", "40");
+        //
+        Log.i(TAG, "onCreateLoader | uriBuilder.toString(): " + uriBuilder.toString());
+        return new NewsLoader(this, uriBuilder.toString());
+    }
 
-        private void startupActivityOnClick(final ViewHolder holder)
-        {
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v)
-                {
-                    if (mTwoPane)
-                    {
-                        Bundle arguments = new Bundle();
-                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                        ItemDetailFragment fragment = new ItemDetailFragment();
-                        fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction().replace(R.id.item_detail_container, fragment).commit();
-                    } else
-                    {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, ItemDetailActivity.class);
-                        intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
 
-                        context.startActivity(intent);
-                    }
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount()
-        {
-            return mValues.size();
-        }
-
-        public class ViewHolder extends RecyclerView.ViewHolder
-        {
-            public final View mView;
-            public final TextView mIdView;
-            public final TextView mContentView;
-            public DummyContent.DummyItem mItem;
-
-            public ViewHolder(View view)
-            {
-                super(view);
-                mView = view;
-                mIdView = (TextView) view.findViewById(R.id.id);
-                mContentView = (TextView) view.findViewById(R.id.content);
+    @Override
+    public void onLoadFinished(Loader<List<DummyContent.DummyItem>> loader, List<DummyContent.DummyItem> newsList) {
+        Log.i(TAG, "onLoadFinished");
+        //
+        if (newsList != null && !newsList.isEmpty()) {
+//            mAdapter.addAll(mNewses); // ERROR
+//            mAdapter = new NewsRecyclerAdapter(this, mNewses);
+            for (int i = 0; i < mNewses.size(); i++) {
+                mAdapter.addItem(i, mNewses.get(i));
             }
-
-            @Override
-            public String toString()
-            {
-                return super.toString() + " '" + mContentView.getText() + "'";
-            }
+            mNewses.addAll(newsList);
+        } else {
+            Snackbar.make(mRecyclerView, getString(R.string.no_news), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<DummyContent.DummyItem>> loader) {
+        Log.i(TAG, "onLoaderReset");
+//        mAdapter.clear(); // ERROR
+        for (int i = 0; i < mAdapter.getItemCount(); i++) {
+            mAdapter.removeItem(i);
+        }
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "onSaveInstanceState: " + mQuery);
+        outState.putString("query", mQuery);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.i(TAG, "onRestoreInstanceState: " + mQuery);
+        mQuery = savedInstanceState.getString("query");
     }
 
 
