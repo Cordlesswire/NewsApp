@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">NewsApp</string>
+    <string name="app_name">Boas Notícias</string>
     <string name="title_item_detail">Item Detail</string>
+    <!---->
+    <string name="no_internet_connection">No internet connection.</string>
+    <string name="search_hint">Magic words</string>
+    <string name="no_news">No news found :(</string>
 </resources>
