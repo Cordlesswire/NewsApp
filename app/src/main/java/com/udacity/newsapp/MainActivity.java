@@ -1,10 +1,7 @@
 package com.udacity.newsapp;
 
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.Loader;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,10 +20,7 @@ import android.view.View;
 
 import com.udacity.newsapp.dummy.DummyContent;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.udacity.newsapp.dummy.DummyContent.ITEMS;
 
 
 public class MainActivity extends AppCompatActivity
@@ -35,12 +30,12 @@ public class MainActivity extends AppCompatActivity
                                      LoaderManager.LoaderCallbacks<List<DummyContent.DummyItem>> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int BOOK_LOADER_ID = 1;
+    //
+    private static final int NEWS_LOADER_ID = 1;
     //
     private String mQuery;
     //
     private NewsRecyclerAdapter mAdapter;
-    private List<DummyContent.DummyItem> mNewses;
     private RecyclerView mRecyclerView;
 
 
@@ -48,33 +43,25 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setupToolbar(toolbar);
-
-        mNewses = new ArrayList<>();
-        mNewses.addAll(ITEMS);
-
+        //
         if (savedInstanceState != null) {
             mQuery = savedInstanceState.getString("query");
         }
-
-        mAdapter = new NewsRecyclerAdapter(this, mNewses);
+        //
+        mAdapter = new NewsRecyclerAdapter(this, DummyContent.ITEMS);
         mRecyclerView = (RecyclerView) findViewById(R.id.item_list);
         assert mRecyclerView != null;
         setupRecyclerView(mRecyclerView, mAdapter);
-
-        ConnectivityManager conn = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = conn.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            LoaderManager loaderManager = getLoaderManager();
-            loaderManager.initLoader(BOOK_LOADER_ID, null, this);
+        //
+        if (QueryUtils.isInternetAccess(MainActivity.this)) {
+            getLoaderManager().initLoader(NEWS_LOADER_ID, null, this);
         } else {
             Snackbar.make(mRecyclerView, getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         }
-
-        getLoaderManager().restartLoader(BOOK_LOADER_ID, null, MainActivity.this);
     }
 
 
@@ -121,29 +108,39 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        ConnectivityManager conn = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = conn.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            mQuery = query;
-            Log.i(TAG, "onQueryTextSubmit | mQuery: " + mQuery);
-            getLoaderManager().restartLoader(BOOK_LOADER_ID, null, this);
-        } else {
-            Snackbar.make(mRecyclerView, getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        }
+        mQuery = query;
+        Log.i(TAG, "onQueryTextSubmit | mQuery: " + mQuery);
         return false;
     }
+
 
     @Override
     public boolean onQueryTextChange(String searchQuery) {
         Log.i(TAG, "onQueryTextChange | searchQuery: " + searchQuery);
         assert searchQuery != null;
-        assert mNewses != null;
-        List<DummyContent.DummyItem> results = mAdapter.filter(searchQuery.trim(), mNewses);//(ArrayList<DummyContent.DummyItem>) DummyContent.ITEMS
-        Log.v("App", searchQuery + ", " + mNewses.size() + ", " + results.size());
-        mAdapter.animateTo(results);
-//        mListView.invalidate();
-        mRecyclerView.scrollToPosition(0);
+        if (QueryUtils.isInternetAccess(MainActivity.this)) {
+            List<DummyContent.DummyItem> results = mAdapter.filter(searchQuery.trim(), DummyContent.ITEMS);
+            Log.v("App", searchQuery + ", " + DummyContent.ITEMS.size() + ", " + results.size());
+            mAdapter.animateTo(results);
+//          mAdapter.filterOld(searchQuery.trim(), (ArrayList<DummyContent.DummyItem>) DummyContent.ITEMS);
+//          mListView.invalidate();
+            mRecyclerView.scrollToPosition(0);
+
+            String newFilter = !TextUtils.isEmpty(searchQuery) ? searchQuery : null;
+            Log.i(TAG, "newFilter: " + newFilter);
+            if (mQuery == null && newFilter == null) {
+                return true;
+            }
+            if (mQuery != null && mQuery.equals(newFilter)) {
+                return true;
+            }
+            mQuery = newFilter;
+            getLoaderManager().restartLoader(NEWS_LOADER_ID, null, this);
+        }
+        else {
+            Snackbar.make(mRecyclerView, "Por favor, ative a Internet para usufluir o máximo deste app", Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
         return true;
     }
 
@@ -164,12 +161,13 @@ public class MainActivity extends AppCompatActivity
         Uri baseUri = Uri.parse(getString(R.string.BASE_NEWS_URL));
         Uri.Builder uriBuilder = baseUri.buildUpon();
         if (mQuery == null) {
-            mQuery = "Udacity";
+            mQuery = "Startup";
         }
         Log.i(TAG, "onCreateLoader | mQuery: " + mQuery);
-        // TODO Rever as duas linhas a seguir:
+        // http://content.guardianapis.com/search?q=mQuery&api-key=test
         uriBuilder.appendQueryParameter("q", mQuery);
-        uriBuilder.appendQueryParameter("maxResults", "40");
+        uriBuilder.appendQueryParameter("api-key", getResources().getString(R.string.key_guardianapis));
+        uriBuilder.appendQueryParameter("page-size", "20");
         //
         Log.i(TAG, "onCreateLoader | uriBuilder.toString(): " + uriBuilder.toString());
         return new NewsLoader(this, uriBuilder.toString());
@@ -179,24 +177,27 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<List<DummyContent.DummyItem>> loader, List<DummyContent.DummyItem> newsList) {
         Log.i(TAG, "onLoadFinished");
-        //
-        if (newsList != null && !newsList.isEmpty()) {
-//            mAdapter.addAll(mNewses); // ERROR
-//            mAdapter = new NewsRecyclerAdapter(this, mNewses);
-            for (int i = 0; i < mNewses.size(); i++) {
-                mAdapter.addItem(i, mNewses.get(i));
-            }
-            mNewses.addAll(newsList);
-        } else {
-            Snackbar.make(mRecyclerView, getString(R.string.no_news), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+        switch (loader.getId()) {
+            case NEWS_LOADER_ID:
+                if (newsList != null && !newsList.isEmpty()) {
+                    for (int i = 0; i < newsList.size(); i++) {
+                        DummyContent.addItem(newsList.get(i));
+                        mAdapter.addItem(i, DummyContent.ITEMS.get(i));
+                        // TODO Como adiciono itens a um RecyclerView.Adapter?
+                    }
+                    return;
+                } else {
+                    Snackbar.make(mRecyclerView, getString(R.string.no_news), Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+                break;
         }
     }
+
 
     @Override
     public void onLoaderReset(Loader<List<DummyContent.DummyItem>> loader) {
         Log.i(TAG, "onLoaderReset");
-//        mAdapter.clear(); // ERROR
         for (int i = 0; i < mAdapter.getItemCount(); i++) {
             mAdapter.removeItem(i);
         }
@@ -209,6 +210,7 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "onSaveInstanceState: " + mQuery);
         outState.putString("query", mQuery);
     }
+
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
