@@ -1,10 +1,8 @@
-package com.udacity.newsapp;
+package com.udacity.newsapp.remote;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.udacity.newsapp.remote.NewsContent;
 
 import org.json.JSONArray;
 import org.json.JSONException;

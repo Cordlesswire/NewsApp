@@ -1,9 +1,9 @@
-package com.udacity.newsapp;
+package com.udacity.newsapp.remote;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import com.udacity.newsapp.remote.NewsContent;
+import com.udacity.newsapp.util.QueryUtils;
 
 import java.util.List;
 
@@ -33,10 +33,9 @@ public class NewsLoader extends AsyncTaskLoader<List<NewsContent.NewsItem>> {
         if (mURL == null) {
             return null;
         }
-//        NewsContent.NewsItem.ITEMS.addAll(QueryUtils.fetchNewsData(mURL));
-//        return NewsContent.NewsItem.ITEMS;
         return QueryUtils.fetchNewsData(mURL);
     }
+
 
 
 }

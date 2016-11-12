@@ -1,4 +1,4 @@
-package com.udacity.newsapp;
+package com.udacity.newsapp.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.udacity.newsapp.R;
 import com.udacity.newsapp.remote.NewsContent;
 
 import java.util.ArrayList;

@@ -19,6 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.udacity.newsapp.remote.NewsContent;
+import com.udacity.newsapp.remote.NewsLoader;
+import com.udacity.newsapp.ui.NewsRecyclerAdapter;
+import com.udacity.newsapp.util.QueryUtils;
 
 import java.util.List;
 

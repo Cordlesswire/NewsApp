@@ -1,4 +1,4 @@
-package com.udacity.newsapp;
+package com.udacity.newsapp.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.udacity.newsapp.remote.NewsContent;
+import com.udacity.newsapp.remote.TheGuardianJSON;
 
 import java.io.BufferedReader;
 import java.io.IOException;
