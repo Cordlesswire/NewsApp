@@ -34,7 +34,8 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private void createItemDeail() {
         Bundle arguments = new Bundle();
-        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID));
+        String extraByMain = getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID);
+        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, extraByMain);
         //
         ItemDetailFragment fragment = new ItemDetailFragment();
         fragment.setArguments(arguments);

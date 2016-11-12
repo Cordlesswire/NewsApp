@@ -3,6 +3,7 @@ package com.udacity.newsapp;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,9 +53,9 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         holder.mTitleView.setText(mValues.get(position).title);
         holder.mDateView.setText(mValues.get(position).date);
         holder.mSectionView.setText(mValues.get(position).section);
-
         startupActivityOnClick(holder);
     }
+
 
     private void startupActivityOnClick(final ViewHolder holder) {
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +66,9 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
                     arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
                     ItemDetailFragment fragment = new ItemDetailFragment();
                     fragment.setArguments(arguments);
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.item_detail_container, fragment).commit();
+                    ((FragmentActivity) mContext).getSupportFragmentManager()
+                            .beginTransaction().replace(R.id.item_detail_container, fragment)
+                            .commit();
                 } else
                 {
                     Context context = v.getContext();
@@ -92,6 +95,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         applyAndAnimateMovedItems(newses);
     }
 
+
     private void applyAndAnimateMovedItems(List<DummyContent.DummyItem> newses) {
         for (int toPosition = newses.size() - 1; toPosition >= 0; toPosition--) {
             final DummyContent.DummyItem model = newses.get(toPosition);
@@ -102,11 +106,13 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         }
     }
 
+
     private void moveItem(int fromPosition, int toPosition) {
         final DummyContent.DummyItem model = mValues.remove(fromPosition);
         mValues.add(toPosition, model);
         notifyItemMoved(fromPosition, toPosition);
     }
+
 
     private void applyAndAnimateAdditions(List<DummyContent.DummyItem> newses) {
         for (int i = 0, count = newses.size(); i < count; i++) {
@@ -115,10 +121,12 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         }
     }
 
+
     public void addItem(int position, DummyContent.DummyItem news) {
         mValues.add(position, news);
         notifyItemInserted(position);
     }
+
 
     private void applyAndAnimateRemovals(List<DummyContent.DummyItem> newses) {
         for (int i = mValues.size() - 1; i >= 0; i--) {
@@ -128,6 +136,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
             }
         }
     }
+
 
     public DummyContent.DummyItem removeItem(int position) {
         final DummyContent.DummyItem news = mValues.remove(position);
@@ -142,14 +151,14 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
     }
 
 
-    public void filter(String trim, ArrayList<DummyContent.DummyItem> newses) {
+    public void filterOld(String trim, ArrayList<DummyContent.DummyItem> newses) {
         trim = trim.toLowerCase(Locale.getDefault());
         if (newses != null) {
             newses.clear();
         }
         if (trim.length() == 0) {
             assert newses != null;
-            newses.addAll(auxNewses);//
+            newses.addAll(auxNewses);
         } else {
             for (DummyContent.DummyItem news : auxNewses) {
                 if (trim.length() != 0 && news.title.toLowerCase(Locale.getDefault()).contains(trim)) {
@@ -177,7 +186,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
             final String date    = item.date;
             final String details = item.details;
             if (id.contains(query) || date.contains(query) || details.contains(query) ||
-                    title.contains(query) || section.contains(query)) {
+                title.contains(query) || section.contains(query)) {
                 result.add(item);
             }
         }
