@@ -33,7 +33,9 @@ public class NewsLoader extends AsyncTaskLoader<List<DummyContent.DummyItem>> {
         if (mURL == null) {
             return null;
         }
-        return null;
+//        DummyContent.DummyItem.ITEMS.addAll(QueryUtils.fetchNewsData(mURL));
+//        return DummyContent.DummyItem.ITEMS;
+        return QueryUtils.fetchNewsData(mURL);
     }
 
 
