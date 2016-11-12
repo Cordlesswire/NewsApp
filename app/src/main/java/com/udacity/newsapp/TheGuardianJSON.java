@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.udacity.newsapp.dummy.DummyContent;
+import com.udacity.newsapp.remote.NewsContent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,12 +26,12 @@ public class TheGuardianJSON {
      * @param newsJSON
      * @return
      */
-    public static List<DummyContent.DummyItem> extractFeatureFromJson(String newsJSON) {
+    public static List<NewsContent.NewsItem> extractFeatureFromJson(String newsJSON) {
         if (TextUtils.isEmpty(newsJSON)) {
             return null;
         }
         //
-        List<DummyContent.DummyItem> newses = new ArrayList<>();
+        List<NewsContent.NewsItem> newses = new ArrayList<>();
         try {
             JSONObject root = new JSONObject(newsJSON);
             JSONObject response = root.optJSONObject("response");
@@ -43,7 +43,7 @@ public class TheGuardianJSON {
             //
             JSONArray results = response.optJSONArray("results");
             for (int i = 0; i < results.length(); i++) {
-                DummyContent.DummyItem news = createDummyItem(results, i);
+                NewsContent.NewsItem news = createDummyItem(results, i);
                 newses.add(news);
             }
         } catch (JSONException e) {
@@ -54,7 +54,7 @@ public class TheGuardianJSON {
 
 
     @NonNull
-    private static DummyContent.DummyItem createDummyItem(JSONArray results, int i) {
+    private static NewsContent.NewsItem createDummyItem(JSONArray results, int i) {
         JSONObject currentResult = results.optJSONObject(i);
         //
         String webTitle           = currentResult.optString("webTitle");
@@ -62,7 +62,7 @@ public class TheGuardianJSON {
         String webPublicationDate = currentResult.optString("webPublicationDate");
         Log.i(TAG, "webTitle: " + webTitle + " | " + "sectionName: " + sectionName + " | " + "webPublicationDate: " + webPublicationDate);
         //
-        return new DummyContent.DummyItem(String.valueOf(i), webTitle, webPublicationDate, sectionName, "details");
+        return new NewsContent.NewsItem(String.valueOf(i), webTitle, webPublicationDate, sectionName, "details");
     }
 
 

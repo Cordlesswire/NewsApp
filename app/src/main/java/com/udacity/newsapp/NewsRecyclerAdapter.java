@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.udacity.newsapp.dummy.DummyContent;
+import com.udacity.newsapp.remote.NewsContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +23,12 @@ import java.util.Locale;
 public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder> {
 
     private Context mContext;
-    private List<DummyContent.DummyItem> mValues;
-    private ArrayList<DummyContent.DummyItem> auxNewses;
+    private List<NewsContent.NewsItem> mValues;
+    private ArrayList<NewsContent.NewsItem> auxNewses;
     private boolean mTwoPane;
 
 
-    public NewsRecyclerAdapter(Context context, List<DummyContent.DummyItem> items) {
+    public NewsRecyclerAdapter(Context context, List<NewsContent.NewsItem> items) {
         mContext = context;
         mValues = items;
         auxNewses = new ArrayList<>();
@@ -89,16 +89,16 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
     }
 
 
-    public void animateTo(List<DummyContent.DummyItem> newses) {
+    public void animateTo(List<NewsContent.NewsItem> newses) {
         applyAndAnimateRemovals(newses);
         applyAndAnimateAdditions(newses);
         applyAndAnimateMovedItems(newses);
     }
 
 
-    private void applyAndAnimateMovedItems(List<DummyContent.DummyItem> newses) {
+    private void applyAndAnimateMovedItems(List<NewsContent.NewsItem> newses) {
         for (int toPosition = newses.size() - 1; toPosition >= 0; toPosition--) {
-            final DummyContent.DummyItem model = newses.get(toPosition);
+            final NewsContent.NewsItem model = newses.get(toPosition);
             final int fromPosition = mValues.indexOf(model);
             if (fromPosition >= 0 && fromPosition != toPosition) {
                 moveItem(fromPosition, toPosition);
@@ -108,29 +108,29 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
 
 
     private void moveItem(int fromPosition, int toPosition) {
-        final DummyContent.DummyItem model = mValues.remove(fromPosition);
+        final NewsContent.NewsItem model = mValues.remove(fromPosition);
         mValues.add(toPosition, model);
         notifyItemMoved(fromPosition, toPosition);
     }
 
 
-    private void applyAndAnimateAdditions(List<DummyContent.DummyItem> newses) {
+    private void applyAndAnimateAdditions(List<NewsContent.NewsItem> newses) {
         for (int i = 0, count = newses.size(); i < count; i++) {
-            final DummyContent.DummyItem news = newses.get(i);
+            final NewsContent.NewsItem news = newses.get(i);
             addItem(i, news);
         }
     }
 
 
-    public void addItem(int position, DummyContent.DummyItem news) {
+    public void addItem(int position, NewsContent.NewsItem news) {
         mValues.add(position, news);
         notifyItemInserted(position);
     }
 
 
-    private void applyAndAnimateRemovals(List<DummyContent.DummyItem> newses) {
+    private void applyAndAnimateRemovals(List<NewsContent.NewsItem> newses) {
         for (int i = mValues.size() - 1; i >= 0; i--) {
-            final DummyContent.DummyItem news = mValues.get(i);
+            final NewsContent.NewsItem news = mValues.get(i);
             if (!newses.contains(news)) {
                 removeItem(i);
             }
@@ -138,8 +138,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
     }
 
 
-    public DummyContent.DummyItem removeItem(int position) {
-        final DummyContent.DummyItem news = mValues.remove(position);
+    public NewsContent.NewsItem removeItem(int position) {
+        final NewsContent.NewsItem news = mValues.remove(position);
         notifyItemRemoved(position);
         return news;
     }
@@ -151,7 +151,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
     }
 
 
-    public void filterOld(String trim, ArrayList<DummyContent.DummyItem> newses) {
+    public void filterOld(String trim, ArrayList<NewsContent.NewsItem> newses) {
         trim = trim.toLowerCase(Locale.getDefault());
         if (newses != null) {
             newses.clear();
@@ -160,7 +160,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
             assert newses != null;
             newses.addAll(auxNewses);
         } else {
-            for (DummyContent.DummyItem news : auxNewses) {
+            for (NewsContent.NewsItem news : auxNewses) {
                 if (trim.length() != 0 && news.title.toLowerCase(Locale.getDefault()).contains(trim)) {
                     assert newses != null;
                     newses.add(news);
@@ -176,10 +176,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
     }
 
 
-    public List<DummyContent.DummyItem> filter(String query, List<DummyContent.DummyItem> newses) {
-        ArrayList<DummyContent.DummyItem> result = new ArrayList<>();
+    public List<NewsContent.NewsItem> filter(String query, List<NewsContent.NewsItem> newses) {
+        ArrayList<NewsContent.NewsItem> result = new ArrayList<>();
         query = query.toLowerCase();
-        for (DummyContent.DummyItem item : newses) {
+        for (NewsContent.NewsItem item : newses) {
             final String id      = item.id.toLowerCase();
             final String title   = item.title.toLowerCase();
             final String section = item.section.toLowerCase();
@@ -201,7 +201,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         public final TextView mTitleView;
         public final TextView mDateView;
         public final TextView mSectionView;
-        public DummyContent.DummyItem mItem;
+        public NewsContent.NewsItem mItem;
 
         public ViewHolder(View view)
         {

@@ -18,7 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.udacity.newsapp.dummy.DummyContent;
+import com.udacity.newsapp.remote.NewsContent;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity
                           implements View.OnFocusChangeListener,
                                      SearchView.OnQueryTextListener,
                                      MenuItemCompat.OnActionExpandListener,
-                                     LoaderManager.LoaderCallbacks<List<DummyContent.DummyItem>> {
+                                     LoaderManager.LoaderCallbacks<List<NewsContent.NewsItem>> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     //
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
             mQuery = savedInstanceState.getString("query");
         }
         //
-        mAdapter = new NewsRecyclerAdapter(this, DummyContent.ITEMS);
+        mAdapter = new NewsRecyclerAdapter(this, NewsContent.ITEMS);
         mRecyclerView = (RecyclerView) findViewById(R.id.item_list);
         assert mRecyclerView != null;
         setupRecyclerView(mRecyclerView, mAdapter);
@@ -119,10 +119,10 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "onQueryTextChange | searchQuery: " + searchQuery);
         assert searchQuery != null;
         if (QueryUtils.isInternetAccess(MainActivity.this)) {
-            List<DummyContent.DummyItem> results = mAdapter.filter(searchQuery.trim(), DummyContent.ITEMS);
-            Log.v("App", searchQuery + ", " + DummyContent.ITEMS.size() + ", " + results.size());
+            List<NewsContent.NewsItem> results = mAdapter.filter(searchQuery.trim(), NewsContent.ITEMS);
+            Log.v("App", searchQuery + ", " + NewsContent.ITEMS.size() + ", " + results.size());
             mAdapter.animateTo(results);
-//          mAdapter.filterOld(searchQuery.trim(), (ArrayList<DummyContent.DummyItem>) DummyContent.ITEMS);
+//          mAdapter.filterOld(searchQuery.trim(), (ArrayList<NewsContent.NewsItem>) NewsContent.ITEMS);
 //          mListView.invalidate();
             mRecyclerView.scrollToPosition(0);
 
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public Loader<List<DummyContent.DummyItem>> onCreateLoader(int id, Bundle bundle) {
+    public Loader<List<NewsContent.NewsItem>> onCreateLoader(int id, Bundle bundle) {
         Uri baseUri = Uri.parse(getString(R.string.BASE_NEWS_URL));
         Uri.Builder uriBuilder = baseUri.buildUpon();
         if (mQuery == null) {
@@ -175,14 +175,14 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onLoadFinished(Loader<List<DummyContent.DummyItem>> loader, List<DummyContent.DummyItem> newsList) {
+    public void onLoadFinished(Loader<List<NewsContent.NewsItem>> loader, List<NewsContent.NewsItem> newsList) {
         Log.i(TAG, "onLoadFinished");
         switch (loader.getId()) {
             case NEWS_LOADER_ID:
                 if (newsList != null && !newsList.isEmpty()) {
                     for (int i = 0; i < newsList.size(); i++) {
-                        DummyContent.addItem(newsList.get(i));
-                        mAdapter.addItem(i, DummyContent.ITEMS.get(i));
+                        NewsContent.addItem(newsList.get(i));
+                        mAdapter.addItem(i, NewsContent.ITEMS.get(i));
                         // TODO Como adiciono itens a um RecyclerView.Adapter?
                     }
                     return;
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public void onLoaderReset(Loader<List<DummyContent.DummyItem>> loader) {
+    public void onLoaderReset(Loader<List<NewsContent.NewsItem>> loader) {
         Log.i(TAG, "onLoaderReset");
         for (int i = 0; i < mAdapter.getItemCount(); i++) {
             mAdapter.removeItem(i);

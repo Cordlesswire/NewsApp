@@ -3,7 +3,7 @@ package com.udacity.newsapp;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import com.udacity.newsapp.dummy.DummyContent;
+import com.udacity.newsapp.remote.NewsContent;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * Created by geovani on 09/11/16.
  */
 
-public class NewsLoader extends AsyncTaskLoader<List<DummyContent.DummyItem>> {
+public class NewsLoader extends AsyncTaskLoader<List<NewsContent.NewsItem>> {
 
     private String mURL;
 
@@ -29,12 +29,12 @@ public class NewsLoader extends AsyncTaskLoader<List<DummyContent.DummyItem>> {
 
 
     @Override
-    public List<DummyContent.DummyItem> loadInBackground() {
+    public List<NewsContent.NewsItem> loadInBackground() {
         if (mURL == null) {
             return null;
         }
-//        DummyContent.DummyItem.ITEMS.addAll(QueryUtils.fetchNewsData(mURL));
-//        return DummyContent.DummyItem.ITEMS;
+//        NewsContent.NewsItem.ITEMS.addAll(QueryUtils.fetchNewsData(mURL));
+//        return NewsContent.NewsItem.ITEMS;
         return QueryUtils.fetchNewsData(mURL);
     }
 

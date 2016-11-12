@@ -5,7 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.udacity.newsapp.dummy.DummyContent;
+import com.udacity.newsapp.remote.NewsContent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class QueryUtils {
     }
 
 
-    public static List<DummyContent.DummyItem> fetchNewsData(String requestUrl) {
+    public static List<NewsContent.NewsItem> fetchNewsData(String requestUrl) {
         URL url = createUrl(requestUrl);
         String jsonResponse = null;
         try {

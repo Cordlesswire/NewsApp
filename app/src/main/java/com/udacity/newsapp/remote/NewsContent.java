@@ -1,4 +1,4 @@
-package com.udacity.newsapp.dummy;
+package com.udacity.newsapp.remote;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.Map;
 
 
-public class DummyContent {
+public class NewsContent {
 
-    public static final List<DummyItem> ITEMS = new ArrayList<>();
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<>();
+    public static final List<NewsItem> ITEMS = new ArrayList<>();
+    public static final Map<String, NewsItem> ITEM_MAP = new HashMap<>();
 
 
-    public static void addItem(DummyItem item) {
+    public static void addItem(NewsItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
 
-    public static class DummyItem
+    public static class NewsItem
     {
         public final String id;
         public final String title;
@@ -26,7 +26,7 @@ public class DummyContent {
         public final String section;
         public final String details;
 
-        public DummyItem(String id, String title, String date, String section, String details)
+        public NewsItem(String id, String title, String date, String section, String details)
         {
             this.id      = id;
             this.title   = title;
