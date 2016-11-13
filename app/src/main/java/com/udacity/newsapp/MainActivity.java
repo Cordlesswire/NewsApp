@@ -125,8 +125,6 @@ public class MainActivity extends AppCompatActivity
             List<NewsContent.NewsItem> results = mAdapter.filter(searchQuery.trim(), NewsContent.ITEMS);
             Log.v("App", searchQuery + ", " + NewsContent.ITEMS.size() + ", " + results.size());
             mAdapter.animateTo(results);
-//          mAdapter.filterOld(searchQuery.trim(), (ArrayList<NewsContent.NewsItem>) NewsContent.ITEMS);
-//          mListView.invalidate();
             mRecyclerView.scrollToPosition(0);
 
             String newFilter = !TextUtils.isEmpty(searchQuery) ? searchQuery : null;
@@ -153,6 +151,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
     @Override
     public boolean onMenuItemActionCollapse(MenuItem item) {
         return true;
@@ -167,12 +166,10 @@ public class MainActivity extends AppCompatActivity
             mQuery = "Startup";
         }
         Log.i(TAG, "onCreateLoader | mQuery: " + mQuery);
-        // http://content.guardianapis.com/search?q=mQuery&api-key=test
         uriBuilder.appendQueryParameter("q", mQuery);
         uriBuilder.appendQueryParameter("api-key", getResources().getString(R.string.key_guardianapis));
         uriBuilder.appendQueryParameter("page-size", "20");
         //
-        Log.i(TAG, "onCreateLoader | uriBuilder.toString(): " + uriBuilder.toString());
         return new NewsLoader(this, uriBuilder.toString());
     }
 
@@ -186,7 +183,6 @@ public class MainActivity extends AppCompatActivity
                     for (int i = 0; i < newsList.size(); i++) {
                         NewsContent.addItem(newsList.get(i));
                         mAdapter.addItem(i, NewsContent.ITEMS.get(i));
-                        // TODO Como adiciono itens a um RecyclerView.Adapter?
                     }
                     return;
                 } else {
