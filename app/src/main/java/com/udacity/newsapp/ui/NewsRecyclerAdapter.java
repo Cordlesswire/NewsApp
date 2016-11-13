@@ -49,7 +49,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
         holder.mTitleView.setText(mValues.get(position).title);
         holder.mDateView.setText(mValues.get(position).date);
         holder.mSectionView.setText(mValues.get(position).section);
@@ -187,7 +186,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         public final View mView;
-        public final TextView mIdView;
         public final TextView mTitleView;
         public final TextView mDateView;
         public final TextView mSectionView;
@@ -197,7 +195,6 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         {
             super(view);
             mView        = view;
-            mIdView      = (TextView) view.findViewById(R.id.id);
             mTitleView   = (TextView) view.findViewById(R.id.titleText);
             mDateView    = (TextView) view.findViewById(R.id.dateText);
             mSectionView = (TextView) view.findViewById(R.id.sectionText);
