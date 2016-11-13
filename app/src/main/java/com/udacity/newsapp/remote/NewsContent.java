@@ -24,15 +24,15 @@ public class NewsContent {
         public final String title;
         public final String date;
         public final String section;
-        public final String details;
+        public final String site;
 
-        public NewsItem(String id, String title, String date, String section, String details)
+        public NewsItem(String id, String title, String date, String section, String site)
         {
             this.id      = id;
             this.title   = title;
             this.date    = date;
             this.section = section;
-            this.details = details;
+            this.site    = site;
         }
 
         @Override

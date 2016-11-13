@@ -58,9 +58,10 @@ public class TheGuardianJSON {
         String webTitle           = currentResult.optString("webTitle");
         String sectionName        = currentResult.optString("sectionName");
         String webPublicationDate = currentResult.optString("webPublicationDate");
+        String webUrl             = currentResult.optString("webUrl");
         Log.i(TAG, "webTitle: " + webTitle + " | " + "sectionName: " + sectionName + " | " + "webPublicationDate: " + webPublicationDate);
         //
-        return new NewsContent.NewsItem(String.valueOf(i), webTitle, webPublicationDate, sectionName, "details");
+        return new NewsContent.NewsItem(String.valueOf(i), webTitle, webPublicationDate, sectionName, webUrl);
     }
 
 

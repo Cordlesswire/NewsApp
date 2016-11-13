@@ -2,8 +2,7 @@ package com.udacity.newsapp.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,28 +53,18 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
         holder.mTitleView.setText(mValues.get(position).title);
         holder.mDateView.setText(mValues.get(position).date);
         holder.mSectionView.setText(mValues.get(position).section);
-        startupActivityOnClick(holder);
+        startupActivityOnClick(holder, position);
     }
 
 
-    private void startupActivityOnClick(final ViewHolder holder) {
+    private void startupActivityOnClick(final ViewHolder holder, final int position) {
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    ((FragmentActivity) mContext).getSupportFragmentManager()
-                            .beginTransaction().replace(R.id.item_detail_container, fragment)
-                            .commit();
-                } else
-                {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
-                    //
+                Context context = v.getContext();
+                Uri webpage = Uri.parse(mValues.get(position).site);
+                Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+                if (intent.resolveActivity(context.getPackageManager()) != null) {
                     context.startActivity(intent);
                 }
             }
@@ -185,8 +174,8 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<NewsRecyclerAdapte
             final String title   = item.title.toLowerCase();
             final String section = item.section.toLowerCase();
             final String date    = item.date;
-            final String details = item.details;
-            if (id.contains(query) || date.contains(query) || details.contains(query) ||
+            final String site    = item.site;
+            if (id.contains(query) || date.contains(query) || site.contains(query) ||
                 title.contains(query) || section.contains(query)) {
                 result.add(item);
             }
