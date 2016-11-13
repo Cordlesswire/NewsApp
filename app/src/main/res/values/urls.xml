@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="BASE_NEWS_URL">https://content.guardianapis.com/search?</string>
+    <string name="BASE_NEWS_URL" translatable="false">https://content.guardianapis.com/search?</string>
 </resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Boas Notícias</string>
+    <string name="snackbar_internet_action">Por favor, ative à Internet para usufluir o máximo deste app.</string>
+</resources>

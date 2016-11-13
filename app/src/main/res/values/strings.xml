@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Boas Notícias</string>
+    <string name="app_name">Good news</string>
     <string name="title_item_detail">Item Detail</string>
     <!---->
     <string name="no_internet_connection">No internet connection.</string>
     <string name="search_hint">Magic words</string>
     <string name="no_news">No news found :(</string>
+    <string name="snackbar_internet_action">Please enable the Internet to get the most out of this app</string>
 </resources>
