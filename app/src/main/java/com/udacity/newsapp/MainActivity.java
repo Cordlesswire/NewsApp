@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.udacity.newsapp.remote.NewsContent;
 import com.udacity.newsapp.remote.NewsLoader;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     //
     private NewsRecyclerAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private ProgressBar mProgressBar;
 
 
     @Override
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity
         //
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setupToolbar(toolbar);
+        //
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         //
         if (savedInstanceState != null) {
             mQuery = savedInstanceState.getString("query");
@@ -139,7 +143,7 @@ public class MainActivity extends AppCompatActivity
             getLoaderManager().restartLoader(NEWS_LOADER_ID, null, this);
         }
         else {
-            Snackbar.make(mRecyclerView, "Por favor, ative a Internet para usufluir o máximo deste app", Snackbar.LENGTH_LONG)
+            Snackbar.make(mRecyclerView, R.string.snackbar_internet_action, Snackbar.LENGTH_LONG)
                     .setAction("Action", null).show();
         }
         return true;
@@ -160,6 +164,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public Loader<List<NewsContent.NewsItem>> onCreateLoader(int id, Bundle bundle) {
+        mProgressBar.setVisibility(View.VISIBLE);
+        //
         Uri baseUri = Uri.parse(getString(R.string.BASE_NEWS_URL));
         Uri.Builder uriBuilder = baseUri.buildUpon();
         if (mQuery == null) {
@@ -183,6 +189,8 @@ public class MainActivity extends AppCompatActivity
                     for (int i = 0; i < newsList.size(); i++) {
                         NewsContent.addItem(newsList.get(i));
                         mAdapter.addItem(i, NewsContent.ITEMS.get(i));
+                        //
+                        mProgressBar.setVisibility(View.INVISIBLE);
                     }
                     return;
                 } else {

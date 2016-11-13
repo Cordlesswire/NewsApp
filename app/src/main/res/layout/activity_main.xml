@@ -32,6 +32,15 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
         <include layout="@layout/include_item_list"/>
+
+        <ProgressBar
+            tools:visibility="visible"
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            />
     </FrameLayout>
 
 
