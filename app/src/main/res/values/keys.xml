@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="key_guardianapis">bfd6bd57-047b-45b8-8237-1315a9fa652d</string>
+    <string name="key_guardianapis">MY_GUARDIAN_APIS</string>
 </resources>
